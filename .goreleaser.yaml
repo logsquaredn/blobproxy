@@ -18,7 +18,8 @@ changelog:
       - Merge branch
 dockers:
   - image_templates:
-    - ghcr.io/logsquaredn/blobproxy:{{ .Version }}
-    - ghcr.io/logsquaredn/blobproxy:{{ .Major }}.{{ .Minor }}
-    - ghcr.io/logsquaredn/blobproxy:{{ .Major }}
-    - ghcr.io/logsquaredn/blobproxy:latest
+      - ghcr.io/logsquaredn/blobproxy:{{ .Version }}
+      - ghcr.io/logsquaredn/blobproxy:{{ .Major }}.{{ .Minor }}
+      - ghcr.io/logsquaredn/blobproxy:{{ .Major }}
+      - ghcr.io/logsquaredn/blobproxy:latest
+    dockerfile: goreleaser.dockerfile

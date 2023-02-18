@@ -1,6 +1,4 @@
-ARG build_image=golang:1.20-alpine3.16
-
-FROM ${build_image} as build
+FROM golang:1.20-alpine3.16 as build
 ENV CGO_ENABLED 0
 WORKDIR $GOPATH/src/github.com/logsquaredn/blobproxy
 ARG semver=0.0.0
