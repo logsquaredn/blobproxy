@@ -1,4 +1,4 @@
-# blobproxy
+# blobproxy  [![CI](https://github.com/logsquaredn/blobproxy/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/logsquaredn/blobproxy/actions) [![godoc](https://pkg.go.dev/badge/github.com/logsquaredn/blobproxy.svg)](https://pkg.go.dev/github.com/logsquaredn/blobproxy) [![goreportcard](https://goreportcard.com/badge/github.com/logsquaredn/blobproxy)](https://goreportcard.com/report/github.com/logsquaredn/blobproxy) ![license](https://shields.io/github/license/logsquaredn/blobproxy)
 
 Go `http.Handler` for serving the contents of a `gocloud.dev/blob.Bucket`, e.g. an s3 bucket.
 
@@ -32,4 +32,4 @@ $ curl http://localhost:8080/my-prefix/my-bucket-object
 
 > See https://gocloud.dev/concepts/urls/ for supported URL formats.
 
-> Remember to escape `&` in the URL's query parameters. See [`docker.compose.yml`](docker.compose.yml) for an example.
+> Remember to escape `&` in the URL's query parameters. See [`docker-compose.yml`](docker-compose.yml) for an example.
