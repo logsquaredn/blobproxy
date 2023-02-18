@@ -1,7 +1,6 @@
 GO = go
 GIT = git
 GOLANGCI-LINT = golangci-lint
-INSTALL = sudo install
 DOCKER-COMPOSE = docker compose
 
 BIN = /usr/local/bin
