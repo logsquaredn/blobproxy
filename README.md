@@ -16,7 +16,7 @@ go get github.com/logsquaredn/blobproxy
 ```sh
 $ blobproxy -h
 Usage:
-  blobproxy {s3|azure|gcs}://bucket [/prefix] [--s3-endpoint=http://minio:9000/] [--s3-force-path-style] [--s3-disable-ssl] [flags]
+  blobproxy {s3|azblob|gs}://bucket [/prefix] [--s3-endpoint=http://minio:9000/] [--s3-force-path-style] [--s3-disable-ssl] [flags]
 
 Flags:
   -h, --help                  help for blobproxy
@@ -30,6 +30,6 @@ $ blobproxy s3://my-bucket /my-prefix
 $ curl http://localhost:8080/my-prefix/my-bucket-object
 ```
 
-> See https://gocloud.dev/concepts/urls/ for supported URL formats. Only supports s3, gs and azblob drivers as of writing.
+> See https://gocloud.dev/concepts/urls/ for supported URL formats.
 
 > Remember to escape `&` in the URL's query parameters. See [`docker.compose.yml`](docker.compose.yml) for an example.

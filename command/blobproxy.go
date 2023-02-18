@@ -25,7 +25,7 @@ func New() *cobra.Command {
 		verbosity int
 		port      int64
 		cmd       = &cobra.Command{
-			Use:           "blobproxy {s3|azure|gcs}://bucket [/prefix] [--s3-endpoint=http://minio:9000/] [--s3-force-path-style] [--s3-disable-ssl]",
+			Use:           "blobproxy {s3|azblob|gs}://bucket [/prefix] [--s3-endpoint=http://minio:9000/] [--s3-force-path-style] [--s3-disable-ssl]",
 			Args:          cobra.RangeArgs(1, 2),
 			Version:       blobproxy.GetSemver(),
 			SilenceErrors: true,
