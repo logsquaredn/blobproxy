@@ -1,0 +1,17 @@
+# hack
+testdata/*
+!testdata/bucket
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# go
+vendor/
+
+# dev
+__debug_bin
+.env

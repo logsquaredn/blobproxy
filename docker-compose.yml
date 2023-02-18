@@ -1,0 +1,21 @@
+version: "3.4"
+
+services:
+  blobproxy:
+    image: ghcr.io/logsquaredn/blobproxy:${BLOBPROXY_TAG:-latest}
+    build: .
+    command: -VV s3://bucket?disableSSL=true\&s3ForcePathStyle=true\&endpoint=minio:9000
+    ports: ["8080:8080"]
+    depends_on: [minio]
+    environment:
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: &access blobproxy
+      AWS_SECRET_ACCESS_KEY: *access
+  minio:
+    image: minio/minio:${MINIO_TAG:-latest}
+    command: server /var/lib/minio --console-address ":9001"
+    volumes: ["./testdata:/var/lib/minio:z"]
+    ports: ["9000:9000", "9001:9001"]
+    environment:
+      MINIO_ROOT_USER: *access
+      MINIO_ROOT_PASSWORD: *access
