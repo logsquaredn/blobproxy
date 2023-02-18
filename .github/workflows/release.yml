@@ -4,7 +4,7 @@ on:
     tags:
       - v*
 permissions:
-  contents: read
+  contents: write
   packages: write
 jobs:
   release:
@@ -27,3 +27,4 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_BUILDKIT: 1
