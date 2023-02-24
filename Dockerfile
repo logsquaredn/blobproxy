@@ -7,6 +7,6 @@ RUN go mod download
 COPY . .
 RUN go build -ldflags "-s -w -X github.com/logsquaredn/blobproxy.Semver=${semver}" -o /assets/blobproxy ./cmd/blobproxy
 
-FROM scratch AS blobproxy
+FROM alpine:3.16
 ENTRYPOINT ["/blobproxy"]
 COPY --from=build /assets /

@@ -5,7 +5,7 @@ DOCKER-COMPOSE = docker compose
 
 BIN = /usr/local/bin
 
-SEMVER ?= 0.1.0
+SEMVER ?= 0.1.1
 
 up:
 	@$(DOCKER-COMPOSE) $@ --build
