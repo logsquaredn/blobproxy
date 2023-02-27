@@ -14,10 +14,6 @@ import (
 	"github.com/logsquaredn/blobproxy/bucketfs"
 	"github.com/spf13/cobra"
 	"gocloud.dev/blob"
-
-	_ "gocloud.dev/blob/azureblob"
-	_ "gocloud.dev/blob/gcsblob"
-	_ "gocloud.dev/blob/s3blob"
 )
 
 func New() *cobra.Command {
