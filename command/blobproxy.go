@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"path"
 	"runtime"
 	"strconv"
+	"time"
 
 	"github.com/logsquaredn/blobproxy"
 	"github.com/logsquaredn/blobproxy/bucketfs"
@@ -34,6 +36,7 @@ func New() *cobra.Command {
 					ctx    = cmd.Context()
 					log    = blobproxy.LoggerFrom(ctx)
 					prefix = "/"
+					errC   = make(chan error, 1)
 				)
 
 				if len(args) > 1 {
@@ -65,8 +68,27 @@ func New() *cobra.Command {
 
 				log.Info("serving " + addr.String() + " at " + l.Addr().String() + prefix)
 
-				//nolint:gosec
-				return http.Serve(l, http.StripPrefix(prefix, bucketfs.NewFileServer(bucketfs.NewFS(bucket).WithContext(ctx))))
+				srv := &http.Server{
+					ReadHeaderTimeout: 30 * time.Second,
+					ReadTimeout:       30 * time.Second,
+					WriteTimeout:      30 * time.Second,
+					IdleTimeout:       2 * time.Minute,
+					BaseContext: func(_ net.Listener) context.Context {
+						return ctx
+					},
+					Handler: http.StripPrefix(prefix, bucketfs.NewFileServer(bucketfs.NewFS(bucket).WithContext(ctx))),
+				}
+
+				go func() {
+					errC <- srv.Serve(l)
+				}()
+
+				select {
+				case <-ctx.Done():
+					return srv.Shutdown(ctx)
+				case err := <-errC:
+					return err
+				}
 			},
 		}
 	)

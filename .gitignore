@@ -1,6 +1,5 @@
-# hack
-testdata/*
-!testdata/bucket
+# minio
+.minio.sys/
 
 # macOS
 .DS_Store

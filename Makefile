@@ -5,7 +5,7 @@ DOCKER-COMPOSE = docker compose
 
 BIN = /usr/local/bin
 
-SEMVER ?= 0.1.4
+SEMVER ?= 0.1.5
 
 up:
 	@$(DOCKER-COMPOSE) $@ --build
@@ -13,15 +13,15 @@ up:
 fmt generate test:
 	@$(GO) $@ ./...
 
-download vendor verify:
+download tidy vendor verify:
 	@$(GO) mod $@
 
 lint:
 	@$(GOLANGCI-LINT) run --fix
 
 release:
-	@$(GIT) tag -a v$(SEMVER) -m v$(SEMVER)
-	@$(GIT) push --follow-tags
+	@$(GIT) tag v$(SEMVER)
+	@$(GIT) push origin --tags
 
 gen: generate
 dl: download
