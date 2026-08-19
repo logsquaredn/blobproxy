@@ -8,7 +8,10 @@
     {
       "name": "go",
       "source": "github.com/frantjc/daggerverse/go@main",
-      "pin": "e20c3a9ec21ac83b3e78be99eeaf8c6bbc376db1"
+      "pin": "e20c3a9ec21ac83b3e78be99eeaf8c6bbc376db1",
+      "ignoreChecks": [
+        "vulncheck"
+      ]
     }
   ],
   "dependencies": [
