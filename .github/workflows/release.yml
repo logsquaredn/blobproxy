@@ -2,28 +2,22 @@ name: Release
 on:
   push:
     tags:
-      - v*
+      # Rough semantic version regexp to only create releases
+      # on complete semantic versions e.g. v1.0.0, but not v1.
+      - v[0-9]+.[0-9]+.[0-9]+*
 permissions:
-  contents: write
-  packages: write
+  contents: read
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: x-access-token
-          password: ${{ github.token }}
       - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
         with:
-          fetch-depth: 0
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-      - uses: goreleaser/goreleaser-action@v3
-        with:
-          args: release --clean
-        env:
+          install_args: dagger
+      - env:
           GITHUB_TOKEN: ${{ github.token }}
-          DOCKER_BUILDKIT: 1
+        run: >-
+          dagger call release
+          --github-token=env://GITHUB_TOKEN
+          --github-repo=${{ github.repository }}

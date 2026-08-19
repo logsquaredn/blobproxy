@@ -1,0 +1,37 @@
+{
+  "name": "blobproxy-dev",
+  "engineVersion": "v0.21.7",
+  "sdk": {
+    "source": "go"
+  },
+  "toolchains": [
+    {
+      "name": "go",
+      "source": "github.com/frantjc/daggerverse/go@main",
+      "pin": "e20c3a9ec21ac83b3e78be99eeaf8c6bbc376db1"
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "go",
+      "source": "github.com/frantjc/daggerverse/go@main",
+      "pin": "e20c3a9ec21ac83b3e78be99eeaf8c6bbc376db1"
+    },
+    {
+      "name": "mise",
+      "source": "github.com/frantjc/daggerverse/mise@main",
+      "pin": "e20c3a9ec21ac83b3e78be99eeaf8c6bbc376db1"
+    },
+    {
+      "name": "release",
+      "source": "github.com/frantjc/daggerverse/release@main",
+      "pin": "e20c3a9ec21ac83b3e78be99eeaf8c6bbc376db1"
+    },
+    {
+      "name": "wolfi",
+      "source": "github.com/dagger/dagger/modules/wolfi@v0.21.7",
+      "pin": "054f94b2d86c0ac00bef11ac4550816973c4aeef"
+    }
+  ],
+  "source": ".dagger"
+}

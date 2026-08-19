@@ -1,6 +1,6 @@
 module github.com/logsquaredn/blobproxy
 
-go 1.24
+go 1.26.5
 
 require (
 	github.com/go-logr/logr v1.2.3

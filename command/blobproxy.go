@@ -23,7 +23,6 @@ func New() *cobra.Command {
 		cmd       = &cobra.Command{
 			Use:           "blobproxy [--port|-p 8080] {s3|azblob|gs}://bucket [/prefix]",
 			Args:          cobra.RangeArgs(1, 2),
-			Version:       blobproxy.GetSemver(),
 			SilenceErrors: true,
 			SilenceUsage:  true,
 			PersistentPreRun: func(cmd *cobra.Command, args []string) {

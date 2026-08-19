@@ -1,11 +1,16 @@
-package blobproxy
+package main
 
-import "runtime/debug"
+import (
+	"runtime/debug"
+	"strings"
+)
 
-var Semver = "0.0.0"
+var (
+	version = "v0.0.0-unknown"
+)
 
-func GetSemver() string {
-	semver := Semver
+func semVer() string {
+	semver := version
 
 	if buildInfo, ok := debug.ReadBuildInfo(); ok {
 		var (
@@ -26,7 +31,10 @@ func GetSemver() string {
 			if i > 7 {
 				i = 7
 			}
-			semver += "+" + revision[:i]
+
+			if !strings.Contains(semver, revision[:i]) {
+				semver += "+" + revision[:i]
+			}
 		}
 
 		if modified {

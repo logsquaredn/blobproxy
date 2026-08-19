@@ -15,8 +15,11 @@ import (
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	cmd := command.New()
 
-	if err := command.New().ExecuteContext(ctx); err != nil {
+	cmd.Version = semVer()
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
 		stop()
 		os.Stdout.WriteString(err.Error() + "\n")
 		os.Exit(1)
