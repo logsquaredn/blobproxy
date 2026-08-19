@@ -89,10 +89,13 @@ func (m *BlobproxyDev) Ship(
 	workspace *dagger.Workspace,
 	githubRepo string,
 	githubToken *dagger.Secret,
+	// +optional
+	// +default="latest"
+	tag string,
 ) error {
 	registry := "ghcr.io"
 	container := m.Container(ctx, workspace, "amd64").WithRegistryAuth(registry, "x-access-token", githubToken)
-	if _, err := container.Publish(ctx, fmt.Sprintf("%s/%s", registry, githubRepo), dagger.ContainerPublishOpts{
+	if _, err := container.Publish(ctx, fmt.Sprintf("%s/%s:%s", registry, githubRepo, tag), dagger.ContainerPublishOpts{
 		PlatformVariants: []*dagger.Container{m.Container(ctx, workspace, "arm64")},
 	}); err != nil {
 		return err
@@ -120,12 +123,17 @@ func (m *BlobproxyDev) Release(
 		return fmt.Errorf("%w: %s", err, trimmedRawLatestVersionRef)
 	}
 
-	registry := "ghcr.io"
-	container := m.Container(ctx, workspace, "amd64").WithRegistryAuth(registry, "x-access-token", githubToken)
-	if _, err := container.Publish(ctx, fmt.Sprintf("%s/%s:%s", registry, githubRepo, latestVersionRef.String()), dagger.ContainerPublishOpts{
-		PlatformVariants: []*dagger.Container{m.Container(ctx, workspace, "arm64")},
-	}); err != nil {
-		return err
+	tags := []string{"latest", latestVersionRef.String()}
+	if latestVersionRef.Prerelease() == "" {
+		tags = append(tags,
+			fmt.Sprintf("%d.%d", latestVersionRef.Major(), latestVersionRef.Minor()),
+			fmt.Sprintf("%d", latestVersionRef.Major()),
+		)
+	}
+	for _, tag := range tags {
+		if err := m.Ship(ctx, workspace, githubRepo, githubToken, tag); err != nil {
+			return err
+		}
 	}
 
 	return dag.Release(latestVersion).
