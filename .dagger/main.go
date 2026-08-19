@@ -84,7 +84,7 @@ func (m *BlobproxyDev) Container(
 			Arch: arch,
 		}).
 		WithExec([]string{"adduser", "-D", "-h", home, "-u", uid, "-g", group, user}).
-		WithFile("/usr/local/bin/blobproxy", m.Binary(ctx, workspace, arch, m.Version(ctx, workspace), "linux")).
+		WithFile("/usr/local/bin/blobproxy", m.Binary(ctx, workspace, m.Version(ctx, workspace), arch, "")).
 		WithEntrypoint([]string{"blobproxy"})
 }
 
