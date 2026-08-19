@@ -55,16 +55,20 @@ func (m *BlobproxyDev) Tag(ctx context.Context, workspace *dagger.Workspace) str
 func (m *BlobproxyDev) Binary(
 	ctx context.Context,
 	workspace *dagger.Workspace,
+	// +default=v0.0.0-unknown
+	version,
 	// +optional
-	arch string,
+	goarch,
+	// +optional
+	goos string,
 ) *dagger.File {
 	return dag.Go(dagger.GoOpts{
 		Workspace: workspace,
 	}).
 		Build(dagger.GoBuildOpts{
 			Pkg:     "./cmd/blobproxy",
-			Ldflags: "-s -w -X main.version=" + m.Version(ctx, workspace),
-			Goarch: arch,
+			Ldflags: "-s -w -X main.version=" + version,
+			Goarch: goarch,
 		})
 }
 
@@ -80,7 +84,7 @@ func (m *BlobproxyDev) Container(
 			Arch: arch,
 		}).
 		WithExec([]string{"adduser", "-D", "-h", home, "-u", uid, "-g", group, user}).
-		WithFile("/usr/local/bin/blobproxy", m.Binary(ctx, workspace, arch)).
+		WithFile("/usr/local/bin/blobproxy", m.Binary(ctx, workspace, arch, m.Version(ctx, workspace), "linux")).
 		WithEntrypoint([]string{"blobproxy"})
 }
 
