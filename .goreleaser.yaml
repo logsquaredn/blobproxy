@@ -8,6 +8,7 @@ builds:
       - linux
     goarch:
       - amd64
+      - arm64
 changelog:
   use: github
   filters:
@@ -18,8 +19,34 @@ changelog:
       - Merge branch
 dockers:
   - image_templates:
-      - ghcr.io/logsquaredn/blobproxy:{{ .Version }}
-      - ghcr.io/logsquaredn/blobproxy:{{ .Major }}.{{ .Minor }}
-      - ghcr.io/logsquaredn/blobproxy:{{ .Major }}
-      - ghcr.io/logsquaredn/blobproxy:latest
+      - ghcr.io/logsquaredn/blobproxy:{{ .Version }}-amd64
     dockerfile: goreleaser.dockerfile
+    use: buildx
+    build_flag_templates:
+      - --platform=linux/amd64
+    skip_push: true
+  - image_templates:
+      - ghcr.io/logsquaredn/blobproxy:{{ .Version }}-arm64
+    dockerfile: goreleaser.dockerfile
+    use: buildx
+    goarch: arm64
+    build_flag_templates:
+      - --platform=linux/arm64
+    skip_push: true
+docker_manifests:
+  - name_template: ghcr.io/logsquaredn/blobproxy:{{ .Version }}
+    image_templates:
+      - ghcr.io/logsquaredn/blobproxy:{{ .Version }}-amd64
+      - ghcr.io/logsquaredn/blobproxy:{{ .Version }}-arm64
+  - name_template: ghcr.io/logsquaredn/blobproxy:{{ .Major }}.{{ .Minor }}
+    image_templates:
+      - ghcr.io/logsquaredn/blobproxy:{{ .Version }}-amd64
+      - ghcr.io/logsquaredn/blobproxy:{{ .Version }}-arm64
+  - name_template: ghcr.io/logsquaredn/blobproxy:{{ .Major }}
+    image_templates:
+      - ghcr.io/logsquaredn/blobproxy:{{ .Version }}-amd64
+      - ghcr.io/logsquaredn/blobproxy:{{ .Version }}-arm64
+  - name_template: ghcr.io/logsquaredn/blobproxy:latest
+    image_templates:
+      - ghcr.io/logsquaredn/blobproxy:{{ .Version }}-amd64
+      - ghcr.io/logsquaredn/blobproxy:{{ .Version }}-arm64
