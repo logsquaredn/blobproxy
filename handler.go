@@ -31,6 +31,7 @@ func New(ctx context.Context, addr string) (http.Handler, error) {
 
 	if useSignedURLsParam := q.Get(useSignedURLsParamKey); useSignedURLsParam != "" {
 		q.Del(useSignedURLsParamKey)
+		u.RawQuery = q.Encode()
 		if h.UseSignedURLs, err = strconv.ParseBool(useSignedURLsParam); err != nil {
 			return nil, err
 		}
