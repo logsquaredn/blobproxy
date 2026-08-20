@@ -14,22 +14,9 @@ go get github.com/logsquaredn/blobproxy
 ## use
 
 ```sh
-$ blobproxy -h
-Usage:
-  blobproxy [--port|-p 8080] {s3|azblob|gs}://bucket [/prefix]
-
-Flags:
-  -h, --help                  help for blobproxy
-  -p, --port int              port (default 8080)
-  -V, --verbose count         verbose
-  -v, --version               version for blobproxy
-```
-
-```sh
 $ blobproxy s3://my-bucket /my-prefix
 $ curl http://localhost:8080/my-prefix/my-bucket-object
 ```
 
 > See https://gocloud.dev/concepts/urls/ for supported URL formats.
-
 > Remember to escape `&` in the URL's query parameters.

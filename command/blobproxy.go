@@ -1,39 +1,38 @@
 package command
 
 import (
-	"fmt"
+	"context"
+	"io"
+	stdlog "log"
+	"log/slog"
 	"net"
 	"net/http"
-	"net/url"
-	"os"
 	"path"
-	"runtime"
-	"strconv"
+	"time"
 
 	"github.com/logsquaredn/blobproxy"
-	"github.com/logsquaredn/blobproxy/bucketfs"
+	"github.com/logsquaredn/blobproxy/internal/log"
 	"github.com/spf13/cobra"
-	"gocloud.dev/blob"
+	"golang.org/x/sync/errgroup"
 )
 
 func New() *cobra.Command {
 	var (
-		verbosity int
-		port      int64
-		cmd       = &cobra.Command{
-			Use:           "blobproxy [--port|-p 8080] {s3|azblob|gs}://bucket [/prefix]",
+		addr     string
+		certFile string
+		keyFile  string
+		logCfg   = new(log.Config)
+		cmd      = &cobra.Command{
+			Use:           "blobproxy [--addr|-a 127.0.0.1:80] [--tls-key tls.key --tls-crt tls.crt] {s3|azblob|gs}://bucket [/prefix]",
 			Args:          cobra.RangeArgs(1, 2),
 			SilenceErrors: true,
 			SilenceUsage:  true,
-			PersistentPreRun: func(cmd *cobra.Command, args []string) {
-				cmd.SetContext(blobproxy.WithLogger(cmd.Context(), blobproxy.NewLogger().V(2-verbosity)))
-			},
 			RunE: func(cmd *cobra.Command, args []string) error {
-				var (
-					ctx    = cmd.Context()
-					log    = blobproxy.LoggerFrom(ctx)
-					prefix = "/"
-				)
+				ctx := log.SloggerInto(cmd.Context(), slog.New(slog.NewTextHandler(cmd.OutOrStdout(), &slog.HandlerOptions{
+					Level: logCfg,
+				})))
+				prefix := "/"
+				log.SetLogger(log.SloggerFrom(ctx))
 
 				if len(args) > 1 {
 					prefix = path.Clean(args[1])
@@ -42,46 +41,60 @@ func New() *cobra.Command {
 					}
 				}
 
-				addr, err := url.Parse(args[0])
+				lis, err := net.Listen("tcp", addr)
 				if err != nil {
 					return err
 				}
 
-				bucket, err := blob.OpenBucket(ctx, addr.String())
-				if err != nil {
-					return err
-				}
-				defer bucket.Close()
-
-				if accessible, err := bucket.IsAccessible(ctx); !accessible || err != nil {
-					return fmt.Errorf("inaccessible bucket %s", addr.String())
-				}
-
-				l, err := net.Listen("tcp", fmt.Sprint(":", port))
+				handler, err := blobproxy.New(ctx, args[0])
 				if err != nil {
 					return err
 				}
 
-				log.Info("serving " + addr.String() + " at " + l.Addr().String() + prefix)
+				srv := &http.Server{
+					ReadHeaderTimeout: time.Second * 5,
+					BaseContext: func(_ net.Listener) context.Context {
+						return ctx
+					},
+					ErrorLog: stdlog.New(io.Discard, "", 0),
+					Handler:  http.StripPrefix(prefix, handler),
+				}
 
-				//nolint:gosec
-				return http.Serve(l, http.StripPrefix(prefix, bucketfs.NewFileServer(bucketfs.NewFS(bucket).WithContext(ctx))))
+				eg, ctx := errgroup.WithContext(cmd.Context())
+
+				eg.Go(func() error {
+					<-ctx.Done()
+					if err = srv.Shutdown(context.WithoutCancel(ctx)); err != nil {
+						return err
+					}
+					return ctx.Err()
+				})
+
+				eg.Go(func() error {
+					log.Info("listening...", "addr", lis.Addr().String())
+
+					if certFile != "" {
+						return srv.ServeTLS(lis, certFile, keyFile)
+					}
+
+					return srv.Serve(lis)
+				})
+
+				return eg.Wait()
 			},
 		}
 	)
 
-	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
-	cmd.PersistentFlags().CountVarP(&verbosity, "verbose", "V", "verbose")
-	cmd.Flags().Int64VarP(&port, "port", "p", mustParsePort(), "port")
+	logCfg.AddFlags(cmd.Flags())
+
+	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }}")
+	cmd.Flags().StringVarP(&addr, "addr", "a", ":8080", "Listen address")
+
+	cmd.Flags().StringVar(&certFile, "tls-crt", "", "TLS certificate file")
+	cmd.Flags().StringVar(&keyFile, "tls-key", "", "TLS private key file")
+	cmd.MarkFlagFilename("tls-crt")
+	cmd.MarkFlagFilename("tls-key")
+	cmd.MarkFlagsRequiredTogether("tls-crt", "tls-key")
 
 	return cmd
-}
-
-func mustParsePort() int64 {
-	p, err := strconv.Atoi(os.Getenv("PORT"))
-	if p != 0 && err != nil {
-		return int64(p)
-	}
-
-	return 8080
 }
