@@ -95,16 +95,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// A redirect is not cacheable unless it says so, and an uncacheable one
-		// makes the object uncacheable too: every request is answered with a
-		// freshly signed URL, and the client's cache is keyed on that URL, so it
-		// can never reuse bytes it already holds. Letting clients reuse the
-		// redirect gives them a stable key to cache the object under.
-		//
-		// The redirect must go stale before the URL it points at does, or a
-		// client would confidently follow a cached redirect to an expired
-		// signature. The remaining tenth of the lifetime is headroom for the
-		// request itself.
 		if r.Method == http.MethodGet || r.Method == http.MethodHead {
 			w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d", int((expiry-expiry/10).Seconds())))
 		}
