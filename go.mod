@@ -3,6 +3,7 @@ module github.com/logsquaredn/blobproxy
 go 1.26.6
 
 require (
+	github.com/frantjc/x v0.0.0-20260722143507-f0d6bf085932
 	github.com/google/uuid v1.6.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5

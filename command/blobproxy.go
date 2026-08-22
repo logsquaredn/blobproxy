@@ -50,6 +50,7 @@ func New() *cobra.Command {
 				if err != nil {
 					return err
 				}
+				defer handler.Close()
 
 				srv := &http.Server{
 					ReadHeaderTimeout: time.Second * 5,
