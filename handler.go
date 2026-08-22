@@ -173,8 +173,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Set("Expires", expires.UTC().Format(http.TimeFormat))
-		w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%d", expiry/time.Second))
+		if r.Method == http.MethodGet {
+			w.Header().Set("Expires", expires.UTC().Format(http.TimeFormat))
+			maxAge := (expiry * 9) / (time.Second * 10)
+			w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d", maxAge))
+		}
 
 		http.Redirect(w, r, signedURL, http.StatusTemporaryRedirect)
 		return
